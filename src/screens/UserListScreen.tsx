@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { View, FlatList, ActivityIndicator, StyleSheet } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 import { fetchUsers } from "../services/api";
 import UserCard from "../components/UserCard";
@@ -8,6 +9,7 @@ import { RandomUser } from "../types/randomUser";
 export default function UserListScreen() {
   const [users, setUsers] = useState<RandomUser[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigation: any = useNavigation();
 
   async function loadUsers() {
     try {
@@ -36,7 +38,14 @@ export default function UserListScreen() {
     <FlatList
       data={users}
       keyExtractor={(item) => item.email}
-      renderItem={({ item }) => <UserCard user={item} />}
+      renderItem={({ item }) => (
+        <UserCard
+          user={item}
+          onPress={() =>
+            navigation.navigate("Profile" as never, { user: item } as never)
+          }
+        />
+      )}
       contentContainerStyle={styles.list}
     />
   );
