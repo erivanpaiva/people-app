@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import { RandomUser } from "../types/randomUser";
+import { getMessages, saveMessage } from "../services/chat";
 
 interface Message {
   id: string;
@@ -19,9 +20,14 @@ interface Message {
 export default function UserChatScreen() {
   const route = useRoute();
   const { user } = route.params as { user: RandomUser };
+  const userId = user.email;
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
+  useEffect(() => {
+    const storedMessages = getMessages(userId);
+    setMessages(storedMessages);
+  }, []);
 
   function handleSend() {
     if (!input.trim()) return;
@@ -32,7 +38,10 @@ export default function UserChatScreen() {
       time: new Date().toLocaleTimeString(),
     };
 
-    setMessages((prev) => [...prev, newMessage]);
+    saveMessage(userId, newMessage);
+
+    const updatedMessages = getMessages(userId);
+    setMessages(updatedMessages);
     setInput("");
   }
 
