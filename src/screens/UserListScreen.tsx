@@ -19,10 +19,11 @@ export default function UserListScreen() {
   const [page, setPage] = useState(1);
   const [loadingMore, setLoadingMore] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [gender, setGender] = useState<string>("all");
   const [nationality, setNationality] = useState<string>("all");
   const nationalities = [
-    "All",
+    "all",
     "us",
     "gb",
     "br",
@@ -46,6 +47,7 @@ export default function UserListScreen() {
     genderParam = gender,
     natParam = nationality,
   ) {
+    setError(null);
     try {
       const data = await fetchUsers(
         pageNumber,
@@ -60,6 +62,7 @@ export default function UserListScreen() {
       }
     } catch (error) {
       console.error("Error fetching users:", error);
+      setError("Failed to load users.");
     } finally {
       setLoading(false);
       setLoadingMore(false);
@@ -102,6 +105,23 @@ export default function UserListScreen() {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.center}>
+        <Text>{error}</Text>
+
+        <Text
+          onPress={() => {
+            setPage(1);
+            loadUsers(1, true);
+          }}
+        >
+          Try Again
+        </Text>
       </View>
     );
   }
