@@ -10,20 +10,39 @@ export default function UserListScreen() {
   const [users, setUsers] = useState<RandomUser[]>([]);
   const [loading, setLoading] = useState(true);
   const navigation: any = useNavigation();
+  const [page, setPage] = useState(1);
+  const [LoadingMore, setLoadingMore] = useState(false);
 
-  async function loadUsers() {
+  async function loadUsers(pageNumber = 1, isRefresh = false) {
     try {
-      const data = await fetchUsers(1);
-      setUsers(data);
+      const data = await fetchUsers(pageNumber);
+
+      if (isRefresh) {
+        setUsers(data);
+      } else {
+        setUsers((prev) => [...prev, ...data]);
+      }
     } catch (error) {
-      console.error("Failed to load users:", error);
+      console.error("Error fetching users:", error);
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   }
 
+  function loadMore() {
+    if (LoadingMore || loading) return;
+
+    setLoadingMore(true);
+
+    const nextPage = page + 1;
+    setPage(nextPage);
+
+    loadUsers(nextPage);
+  }
+
   useEffect(() => {
-    loadUsers();
+    loadUsers(1);
   }, []);
 
   if (loading) {
@@ -47,6 +66,11 @@ export default function UserListScreen() {
         />
       )}
       contentContainerStyle={styles.list}
+      onEndReached={loadMore}
+      onEndReachedThreshold={0.5}
+      ListFooterComponent={
+        LoadingMore ? <ActivityIndicator size="small" /> : null
+      }
     />
   );
 }
