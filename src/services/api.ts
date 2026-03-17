@@ -10,7 +10,6 @@ export async function fetchUsers(
   const params = new URLSearchParams({
     page: page.toString(),
     results: "20",
-    seed: "peopleapp",
   });
 
   if (gender) {

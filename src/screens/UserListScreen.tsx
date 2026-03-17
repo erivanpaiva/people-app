@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
-import { View, FlatList, ActivityIndicator, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  ActivityIndicator,
+  StyleSheet,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 import { fetchUsers } from "../services/api";
@@ -11,12 +17,41 @@ export default function UserListScreen() {
   const [loading, setLoading] = useState(true);
   const navigation: any = useNavigation();
   const [page, setPage] = useState(1);
-  const [LoadingMore, setLoadingMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [gender, setGender] = useState<string>("all");
+  const [nationality, setNationality] = useState<string>("all");
+  const nationalities = [
+    "All",
+    "us",
+    "gb",
+    "br",
+    "fr",
+    "de",
+    "es",
+    "au",
+    "ca",
+    "fi",
+    "nl",
+    "ch",
+    "dk",
+    "no",
+    "ie",
+    "nz",
+  ];
 
-  async function loadUsers(pageNumber = 1, isRefresh = false) {
+  async function loadUsers(
+    pageNumber = 1,
+    isRefresh = false,
+    genderParam = gender,
+    natParam = nationality,
+  ) {
     try {
-      const data = await fetchUsers(pageNumber);
+      const data = await fetchUsers(
+        pageNumber,
+        genderParam === "all" ? undefined : genderParam,
+        natParam === "all" ? undefined : natParam,
+      );
 
       if (isRefresh) {
         setUsers(data);
@@ -32,7 +67,7 @@ export default function UserListScreen() {
   }
 
   function loadMore() {
-    if (LoadingMore || loading) return;
+    if (loadingMore || loading) return;
 
     setLoadingMore(true);
 
@@ -51,6 +86,14 @@ export default function UserListScreen() {
     setRefreshing(false);
   }
 
+  function applyFilters(newGender: string, newNat: string) {
+    setGender(newGender);
+    setNationality(newNat);
+    setPage(1);
+    setUsers([]);
+    loadUsers(1, true, newGender, newNat);
+  }
+
   useEffect(() => {
     loadUsers(1);
   }, []);
@@ -64,26 +107,50 @@ export default function UserListScreen() {
   }
 
   return (
-    <FlatList
-      data={users}
-      keyExtractor={(item) => item.email}
-      renderItem={({ item }) => (
-        <UserCard
-          user={item}
-          onPress={() =>
-            navigation.navigate("Profile" as never, { user: item } as never)
-          }
-        />
-      )}
-      contentContainerStyle={styles.list}
-      onEndReached={loadMore}
-      onEndReachedThreshold={0.5}
-      ListFooterComponent={
-        LoadingMore ? <ActivityIndicator size="small" /> : null
-      }
-      refreshing={refreshing}
-      onRefresh={handleRefresh}
-    />
+    <View style={{ flex: 1 }}>
+      <View style={styles.filtersContainer}>
+        <View style={styles.filterGroup}>
+          <Text>Gender</Text>
+
+          <Text onPress={() => applyFilters("all", nationality)}>All</Text>
+          <Text onPress={() => applyFilters("male", nationality)}>Male</Text>
+          <Text onPress={() => applyFilters("female", nationality)}>
+            Female
+          </Text>
+        </View>
+
+        <View style={styles.filterGroup}>
+          <Text>Nationality</Text>
+
+          {nationalities.map((nat) => (
+            <Text key={nat} onPress={() => applyFilters(gender, nat)}>
+              {nat}
+            </Text>
+          ))}
+        </View>
+      </View>
+
+      <FlatList
+        data={users}
+        keyExtractor={(item) => item.email}
+        renderItem={({ item }) => (
+          <UserCard
+            user={item}
+            onPress={() =>
+              navigation.navigate("Profile" as never, { user: item } as never)
+            }
+          />
+        )}
+        contentContainerStyle={styles.list}
+        onEndReached={loadMore}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={
+          loadingMore ? <ActivityIndicator size="small" /> : null
+        }
+        refreshing={refreshing}
+        onRefresh={handleRefresh}
+      />
+    </View>
   );
 }
 
@@ -95,5 +162,16 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  filtersContainer: {
+    padding: 10,
+    backgroundColor: "#fff",
+  },
+
+  filterGroup: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+    marginBottom: 8,
   },
 });
