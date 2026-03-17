@@ -12,6 +12,7 @@ export default function UserListScreen() {
   const navigation: any = useNavigation();
   const [page, setPage] = useState(1);
   const [LoadingMore, setLoadingMore] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   async function loadUsers(pageNumber = 1, isRefresh = false) {
     try {
@@ -39,6 +40,15 @@ export default function UserListScreen() {
     setPage(nextPage);
 
     loadUsers(nextPage);
+  }
+
+  async function handleRefresh() {
+    setRefreshing(true);
+    setPage(1);
+
+    await loadUsers(1, true);
+
+    setRefreshing(false);
   }
 
   useEffect(() => {
@@ -71,6 +81,8 @@ export default function UserListScreen() {
       ListFooterComponent={
         LoadingMore ? <ActivityIndicator size="small" /> : null
       }
+      refreshing={refreshing}
+      onRefresh={handleRefresh}
     />
   );
 }
