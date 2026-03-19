@@ -13,12 +13,17 @@ export const styles = StyleSheet.create({
   },
 
   header: {
-    height: 44,
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 62,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 16,
-    marginBottom: 16,
+    zIndex: 10,
+    elevation: 10,
   },
 
   touchArea: {
@@ -180,5 +185,14 @@ export const styles = StyleSheet.create({
 
   chipTextActive: {
     color: "#FFFFFF",
+  },
+
+  fadeOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 100,
+    zIndex: 5,
   },
 });

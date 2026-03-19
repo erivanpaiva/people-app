@@ -9,10 +9,12 @@ import {
   Keyboard,
   TouchableOpacity,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { SymbolView } from "expo-symbols";
 import { GlassView } from "expo-glass-effect";
+import { LinearGradient } from "expo-linear-gradient";
+import { useNavigation } from "@react-navigation/native";
 import { styles } from "./styles";
 import UserCard from "../../components/UserCard";
 import { fetchUsers } from "../../services/api";
@@ -29,6 +31,7 @@ export default function UserListScreen() {
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const insets = useSafeAreaInsets();
   const filteredUsers = users.filter((user) => {
     const fullName = `${user.name.first} ${user.name.last}`.toLowerCase();
     return fullName.includes(searchText.toLowerCase());
@@ -167,7 +170,20 @@ export default function UserListScreen() {
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
       {isSearching ? (
-        <View style={styles.searchContainer}>
+        <View
+          style={[
+            styles.searchContainer,
+            {
+              position: "absolute",
+              top: insets.top,
+              height: 62,
+              justifyContent: "center",
+              left: 0,
+              right: 0,
+              zIndex: 10,
+            },
+          ]}
+        >
           <View style={styles.searchShadow}>
             <View style={styles.searchInputWrapper}>
               <SymbolView
@@ -197,7 +213,19 @@ export default function UserListScreen() {
           </View>
         </View>
       ) : (
-        <View style={styles.header}>
+        <View
+          style={[
+            styles.header,
+            {
+              position: "absolute",
+              top: insets.top,
+              height: 62,
+              left: 0,
+              right: 0,
+              zIndex: 10,
+            },
+          ]}
+        >
           <TouchableOpacity
             activeOpacity={0.7}
             onPress={openFilter}
@@ -263,6 +291,7 @@ export default function UserListScreen() {
         )}
         contentContainerStyle={{
           paddingHorizontal: 20,
+          paddingTop: insets.top + 30,
           paddingBottom: 24,
           flexGrow: 1,
         }}
@@ -276,6 +305,19 @@ export default function UserListScreen() {
         refreshing={refreshing}
         onRefresh={handleRefresh}
       />
+
+      <View style={styles.fadeOverlay} pointerEvents="none">
+        <LinearGradient
+          colors={[
+            "#F2F2F7",
+            "rgba(242,242,247,0.95)",
+            "rgba(242,242,247,0.6)",
+            "rgba(242,242,247,0)",
+          ]}
+          locations={[0.1, 0.7, 0.9, 1]}
+          style={{ flex: 1 }}
+        />
+      </View>
 
       <Modal
         visible={isFilterVisible}
