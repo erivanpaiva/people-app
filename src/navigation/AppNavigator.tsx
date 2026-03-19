@@ -10,9 +10,21 @@ export default function AppNavigator() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen name="Users" component={UserListScreen} />
-        <Stack.Screen name="Profile" component={UserProfileScreen} />
-        <Stack.Screen name="Chat" component={UserChatScreen} />
+        <Stack.Screen
+          name="Users"
+          component={UserListScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Profile"
+          component={UserProfileScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Chat"
+          component={UserChatScreen}
+          options={{ headerShown: false }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
