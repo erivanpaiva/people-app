@@ -32,13 +32,16 @@ Aplicativo mobile desenvolvido com React Native e TypeScript que permite explora
 
 Abra o terminal e execute:
 
-`git clone https://github.com/erivanpaiva/people-app`
+```
+git clone https://github.com/erivanpaiva/people-app
+```
 
 ### 2. Instale as dependências
 
 Entre na pasta do projeto e execute o comando para instalar as bibliotecas necessárias:
 
-```cd people-app
+```
+cd people-app
 npm install
 ```
 
@@ -46,7 +49,9 @@ npm install
 
 Ainda na pasta do projeto, use o comando para iniciá-lo no Expo Go:
 
-`npx expo start`
+```
+npx expo start
+```
 
 ### 4. Visualize no Celular
 
